@@ -1,12 +1,49 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('interview-form');
+    const generalForm = document.getElementById('general-interview-form');
+    const resumeForm = document.getElementById('resume-interview-form');
     const resultContainer = document.getElementById('result-container');
-    const submitButton = form.querySelector('button[type="submit"]');
 
-    form.addEventListener('submit', async (event) => {
+    // Handle the General Interview Form submission
+    generalForm.addEventListener('submit', async (event) => {
         event.preventDefault();
+        const submitButton = generalForm.querySelector('button[type="submit"]');
+        const formData = new FormData(generalForm);
+        const request = {
+            jobRole: formData.get('jobRole'),
+            experienceLevel: formData.get('experienceLevel'),
+            numberOfQuestions: parseInt(formData.get('numberOfQuestions'), 10)
+        };
 
-        // Disable button and show processing message
+        await handleRequest(
+            '/api/v1/interview/generate',
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(request)
+            },
+            submitButton
+        );
+    });
+
+    // Handle the Resume Interview Form submission
+    resumeForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const submitButton = resumeForm.querySelector('button[type="submit"]');
+        const formData = new FormData(resumeForm);
+
+        await handleRequest(
+            '/api/v1/resume-interview/generate',
+            {
+                method: 'POST',
+                body: formData // No 'Content-Type' header needed; browser sets it for FormData
+            },
+            submitButton
+        );
+    });
+
+    // Generic function to handle fetch, feedback, and display
+    async function handleRequest(url, options, submitButton) {
+        const originalButtonText = submitButton.textContent;
         submitButton.disabled = true;
         submitButton.textContent = 'Generating...';
         resultContainer.innerHTML = `
@@ -18,22 +55,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const startTime = performance.now();
 
-        const formData = new FormData(form);
-        const request = {
-            jobRole: formData.get('jobRole'),
-            experienceLevel: formData.get('experienceLevel'),
-            numberOfQuestions: parseInt(formData.get('numberOfQuestions'), 10)
-        };
-
         try {
-            const response = await fetch('/api/v1/interview/generate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(request),
-            });
-
+            const response = await fetch(url, options);
             const endTime = performance.now();
             const duration = ((endTime - startTime) / 1000).toFixed(2);
 
@@ -49,11 +72,10 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error:', error);
             resultContainer.innerHTML = `<p class="error">An error occurred: ${error.message}</p>`;
         } finally {
-            // Re-enable button
             submitButton.disabled = false;
-            submitButton.textContent = 'Generate Questions';
+            submitButton.textContent = originalButtonText;
         }
-    });
+    }
 
     function displayResults(data, duration) {
         if (!data.questions || data.questions.length === 0) {
