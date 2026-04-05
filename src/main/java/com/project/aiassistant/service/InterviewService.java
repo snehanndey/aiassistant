@@ -5,7 +5,6 @@ import com.project.aiassistant.dto.InterviewQuestion;
 import com.project.aiassistant.dto.InterviewRequest;
 import com.project.aiassistant.dto.InterviewResponse;
 import com.project.aiassistant.exception.ApiException;
-import com.project.aiassistant.integration.GeminiApiClient;
 import com.project.aiassistant.integration.GroqApiClient;
 import com.project.aiassistant.util.PromptBuilder;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +23,8 @@ public class InterviewService {
 
     private final GroqApiClient groqApiClient;
     private final ObjectMapper objectMapper;
-    private final PromptBuilder promptBuilder;
-    private final GeminiApiClient geminiApiClient;
+    /*private final PromptBuilder promptBuilder;
+    private final GeminiApiClient geminiApiClient;*/
 
     @Cacheable(value = "interviewQuestions",
             key = "#request.jobRole + '-' + #request.experienceLevel + '-' + #request.numberOfQuestions"
@@ -36,14 +35,14 @@ public class InterviewService {
                 request.getJobRole(),
                 request.getExperienceLevel(),
                 request.getNumberOfQuestions());
-        String prompt = promptBuilder.buildInterviewPrompt(
+        String prompt = PromptBuilder.buildInterviewPrompt(
                 request.getJobRole(),
                 request.getExperienceLevel(),
                 request.getNumberOfQuestions());
-        /*String rawResponse1 = groqApiClient.sendPrompt(prompt);
-            List<InterviewQuestion> interviewQuestionList1 =  parceResponce(rawResponse1);*/
-        String rawResponse = geminiApiClient.sendPrompt(prompt);
-        List<InterviewQuestion> interviewQuestionList =  parceResponce(rawResponse);
+        String rawResponse1 = groqApiClient.sendPrompt(prompt);
+            List<InterviewQuestion> interviewQuestionList =  parceResponce(rawResponse1);
+       /* String rawResponse = geminiApiClient.sendPrompt(prompt);
+        List<InterviewQuestion> interviewQuestionList =  parceResponce(rawResponse);*/
 
 
 

@@ -39,7 +39,7 @@ gemini:
   api:
     key: ${GEMINI_API_KEY}
     url: https://generativelanguage.googleapis.com/v1beta/models/
-    model: gemini-flash-latest
+    model: gemini-3-flash-preview #gemini-flash-latest
     max-tokens: 18192
   # Logging
 logging:
