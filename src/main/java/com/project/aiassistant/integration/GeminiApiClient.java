@@ -10,7 +10,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.Map;
@@ -48,15 +47,14 @@ public class GeminiApiClient {
             log.debug("Raw Gemini response: {}", rawJson);
             System.out.println(rawJson);
 
-            String containt=rawJson
+            assert rawJson != null;
+            return rawJson
                     .path("candidates")
                     .get(0)
                     .path("content")
                     .path("parts")
                     .get(0)
-                    .path("text")
-                    .asText();
-            return containt;
+                    .path("text").asString();
 
         }   catch (WebClientResponseException e) {
         log.error("Full Gemini error body: {}", e.getResponseBodyAsString());
