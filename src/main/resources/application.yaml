@@ -1,0 +1,51 @@
+# Ser
+server:
+  port: 8080
+
+  # App info
+spring:
+  application:
+    name: ai-interview-assistant
+# Remove caffeine config, add Redis config
+  cache:
+    type: redis
+
+  # Redis connection
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  # TTL — 24 hours in milliseconds
+      time-to-live: 86400000
+  # Readable cache keys in Redis
+      use-key-prefix: true
+      key-prefix: interview-assistant
+
+  # Groq API Configuration
+  # The actual value comes from your environment variable
+  # Never put the real key here
+
+
+devtools:
+   restart:
+     enabled: false
+groq:
+  api:
+    key: ${GROQ_API_KEY}
+    base-url: https://api.groq.com/openai/v1
+    model: llama-3.3-70b-versatile
+    max-tokens: 1024
+gemini:
+  api:
+    key: ${GEMINI_API_KEY}
+    url: https://generativelanguage.googleapis.com/v1beta/models/
+    model: gemini-flash-latest
+    max-tokens: 18192
+  # Logging
+logging:
+  level:
+    com:
+      project:
+        aiassistant: DEBUG
+
+
